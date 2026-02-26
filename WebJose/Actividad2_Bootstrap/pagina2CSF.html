@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- PAQUETERIAS DE BOOSTRAP DE JS Y CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- incluimos hoja local de estilos -->
+    <link href="pagina2CSF.css" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tama en bootstrap</title>
+</head>
+
+<body>
+    <!-- Vamos a poner la primera row de bootsrtap-->
+    <div class="container-fluid text-primary">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mt-4 p-5 bg-primary text-white rounded">
+                    <h1 class="jumbotron">Tama la jefa de estación</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- vamos a tener 3 contenedores, 3 divs -->
+            <div class="col-sm-6"> <!-- Un div para texto, columna sm(cuanto se puede comprimir)-->
+                <p>
+                    Tama (たま? 29 de abril de 1999 – 22 de junio de 2015) fue una gata calicó que ganó fama por ser jefa
+                    de
+                    estación y directora de operaciones de Estación Kishi en la Línea Kishigawa en Kinokawa, Prefectura
+                    de
+                    Wakayama, Japón.[1]
+                </p>
+            </div>
+
+            <div class="col-md-6"> <!-- Un div para imagen, columna sm(cuanto se puede comprimir) 4-->
+                <img id="tamaid" class="rounded"
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Station-Master_Tama.JPG/500px-Station-Master_Tama.JPG"
+                    alt="tama la gata">
+            </div>
+        </div>
+
+        <div class="row border p-5">
+            <div class="col-sm-4 text-primary">
+                <h3>Opcion1</h3>
+            </div>
+            <div class="col-sm-4 text-danger">
+                <h3>Opcion2</h3>
+            </div>
+            <div class="col-sm-4 text-success">
+                <h3>Opcion3</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/IGOqOzE3znk?si=3FptG35aMW-yVugr"
+                    title="Youtube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+            <div class="col-md-7">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing
+                    elit, sed do eiusmod tempor incididunt ut labore
+                    et dolore magna aliqua. Ut enim ad minim veniam,
+                    quis nostrud exercitation ullamco laboris nisi
+                    ut aliquip ex ea commodo consequat. Duis aute
+                    irure dolor in reprehenderit in voluptate velit
+                    esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident,
+                    sunt in culpa qui officia deserunt mollit anim
+                    id est laborum.</p>
+            </div>
+
+        </div>
+        <div class="spinner-border"></div>
+
+    </div>
+
+
+</body>
+
+</html>
+
+<!-- Si usamos plantilla estandar de boostrap: poner dentro del body en el primer div un div que  class="container-fluid text-primary" , es para q respete las proporciones d elos anchos y todo va adentro del div-->
