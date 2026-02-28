@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="index.css"> <!-- REL: ARCHIVO RELACIONAL-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Casa de Frida</title>
+    <script src="index.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>LA CASA DE FRIDA</h1>
+        <h2> Un Cat Café donde tú eres invitado… y Frida es la dueña. </h2>
+    </header>
+
+    <section class="header">
+        <img src="Frida.png" alt="Frida">
+    </section>
+
+    <section class="header">
+        <h2>Bienvenido a La Casa de Frida</h2>
+        <h3>Café caliente, siestas compartidas y ronroneos infinitos.</h3>
+    </section>
+
+    <div class="content">
+        <p id="par1">
+            La Casa de Frida es un espacio acogedor donde el aroma del café
+            recién hecho se mezcla con suaves ronroneos y miradas curiosas.
+            Aquí no solo vienes a disfrutar una bebida deliciosa, sino a compartir
+            momentos tranquilos, risas y siestas improvisadas con nuestra dueña favorita.
+            Cada rincón está pensado para que te sientas como en casa… porque cuando
+            entras, formas parte de nuestra pequeña familia felina.
+        </p>
+
+        <button type="button" onclick="traducir()">Traducir</button>
+
+    </div>
+
+
+
+    <h3 class="menu-title">MENÚ</h3>
+    <div class="menu">
+
+        <div class="content">
+
+
+            <h4>Bebidas Calientes</h4>
+            <ul>
+                <li class="calientes">Latte
+                    <p>Espresso con leche cremosa y arte latte</p>
+                </li>
+
+                <li class="calientes">Capuccino
+                    <p>Espuma suave con un toque de canela</p>
+                </li>
+
+                <li class="calientes">Chocolate Caliente
+                    <p>Chocolate caliente espeso con malvaviscos</p>
+                </li>
+
+                <li class="calientes">Matcha latte
+                    <p>Matcha latte cremoso con leche de tu elección</p>
+                </li>
+
+            </ul>
+            <h4>Bebidas Frías</h4>
+
+            <ul>
+                <li class="frias">Frappuccino
+                    <p>Frappe de café con crema batida</p>
+                </li>
+
+                <li class="frias">Cold brew
+                    <p>Café frío intenso y refrescante</p>
+                </li>
+
+                <li class="frias">Latte helado
+                    <p>Espresso con leche fría y hielo</p>
+                </li>
+
+                <li class="frias">Té helado
+                    <p>Té negro refrescante con un toque frutal</p>
+                </li>
+
+            </ul>
+
+            <div class="filtros">
+                <button onclick="filtrarMenu('todas')">Todas</button>
+                <button onclick="filtrarMenu('calientes')">Calientes</button>
+                <button onclick="filtrarMenu('frias')">Frías</button>
+            </div>
+
+        </div>
+
+        <div class="image">
+            <img src="https://i.pinimg.com/736x/65/74/06/65740694a46450b393cdda2444412aff.jpg">
+        </div>
+
+
+    </div>
+</body>
+
+
+</html>

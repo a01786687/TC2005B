@@ -1,0 +1,72 @@
+/* body aplica estilos a toda la pagina, define el color del texto por defecto y el color de fondo de la p[agina */
+body {
+    color: #332727;
+    background-color: #EDCED5;
+    margin: 0;
+    /* ponemos margin 0 para que el contenido llegue hasta los bordes*/
+}
+
+/* clase header: se aplica a los divs <div class="Header"> */
+.header {
+    text-align: center;
+    color: #FFFFFF;
+    background-color: #756464;
+    padding: 20px;
+}
+
+/* clase center, es para centrar cosas como la imagen */
+
+.center {
+    text-align: center;
+    margin: 20px;
+}
+
+/* clase center img, a todas las imagenes dentro de .center hace que midan eso y mantengan proporcion*/
+.center img {
+    width: 200px;
+}
+
+/* clase .content se usa en <div class="content"> */
+
+.content {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 40px;
+    padding: 25px;
+    text-align: justify;
+    color: #FFFFFF;
+    background-color: #D6A3B3;
+    border: 2px dashed white;
+    border-radius: 10px;
+}
+
+/* MENU */
+
+.menu {
+    justify-content: center;
+    gap: 40px;
+}
+
+.image img {
+    display: block;
+    margin: 0 auto;
+    width: 250px;
+    border-radius: 10px;
+}
+
+/* listas y descripciones de bebidas */
+
+ul {
+    list-style-position: inside;
+    /*hace que los puntos de la lista estén dentro del bloque de textp*/
+}
+
+li p {
+    /* p dentro de li osea los parrafos dentro de las listas*/
+    font-size: 14px;
+    margin: 5px 0 15px 0;
+}
+
+/* clase menu-title: se aplica a los h3 <h3 class="menu-title"> */
+.menu-title {
+    text-align: center;
+}
