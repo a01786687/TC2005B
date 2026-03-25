@@ -6,7 +6,9 @@
 
 "use strict";
 
-// Global variables
+// GLOBAL VARIABLES
+
+// defining the size of the canvas
 const canvasWidth = 640;
 const canvasHeight = 480;
 
@@ -14,14 +16,15 @@ const canvasHeight = 480;
 // context of the canvas
 let ctx;
 
-// Variable to store the time at the previous frame
+// Variable to store the time of the previous frame
 let oldTime = 0;
 
 // global audio variable
 let ping;
 
-/* Paddle object
-  Paddle represents the player bar, instead of using the GameObject class from the lib, 
+
+// MAIN OBJECTS
+/* Paddle object: Represents the player bar, instead of using the GameObject class from the lib, 
   the paddle is implemented as a simple object with basic properties like position, 
   size while following the same idea, this is because I wanted to learn more in depth 
   about the basic concepts
@@ -31,11 +34,16 @@ let paddle = { x: 270, y: 430, width: 100, height: 20, color: "white", velocity:
 
 /*
 Ball object
+
 Ball represents the ball, instead of using the Vector.js lib, it uses a simplified 
 version where position is stored with x and y, velocity with x and y
+
+To make the use of the boxOverlap() function from the game_functions lib, I added the position and halfSize properties as objects inside the ball object
+The ball now has 2 ways of storing the position, the general one x,y which are used to draw and move the ball
+Position and halfSize are used so the library collision function can detect overlaps
 */
 
-let ball = { x: canvasWidth/2, y: canvasHeight/2, radius: 13, color: "black", velocity: {x:220, y:-220}};
+let ball = { x: canvasWidth/2, y: canvasHeight/2, radius: 13, color: "black", velocity: {x:220, y:-220}, position: {x: canvasWidth/2, y: canvasHeight/2}, halfSize: {x: 13, y: 13}};
 let ballImage = new Image();
 ballImage.src = "../../assets/sprites/gog.png";
 
@@ -43,34 +51,35 @@ ballImage.src = "../../assets/sprites/gog.png";
 let background = new Image();
 background.src = "../../assets/backgrounds/retro.png";
 
-/* blocks array object
-*/
+// blocks array, which will be filled by generateBlocks() function, each block also has the object position and halfSize to make use of the lib
 let blocks = [];
 // let blocks = [{x: 50, y: 100, width: 100, height: 30, color: "white", visible:true}, 
               //{x: 155, y: 100, width: 100, height: 30, color: "white", visible:true}];
+
 
 // global variables for right and left flags, both initialized in false
 let rightOn = false;
 let leftOn = false;
 
-// global variable for the player's lives
+// GAME STATE VARIABLES
+// player's lives
 let lives = 3;
 
-// global variable for gameOver status
+// gameOver status
 let gameOver = false;
 
-// global variable for gameWon status
+// gameWon status
 let gameWon = false;
 
-// global variable for ball status
+// ball status
 let ballMoving = false; // ball starts stopped
 
-// global variable for destroyed blocks counter
+// destroyed blocks counter
 let destroyedBlocks = 0;
 
 /*
-Function main:
-looks up for the canvas in the HTML file
+main() function:
+looks up for the canvas enelemnt in the HTML file
 sets the canvas width
 sets the canvas height
 gets the 2d context
@@ -92,6 +101,9 @@ function main(){
     // => arrow function
     // const functionName = (parameters) => { // function body };
 
+    // EVENT LISTENERS
+
+    // right arrow: activates rightOn 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'ArrowRight') {
             rightOn = true;
@@ -104,6 +116,7 @@ function main(){
         }
     });
 
+    // left arrow: activates leftOn
     document.addEventListener('keyup', (event) => {
        if (event.key === 'ArrowRight') {
             rightOn = false;
@@ -114,6 +127,7 @@ function main(){
         } 
     });
 
+    // spacebar
     document.addEventListener('keydown', (event) => {
     if (event.key === ' ') {
         if (!ballMoving) {
@@ -124,6 +138,7 @@ function main(){
     }
 });
 
+    // r letter key
     document.addEventListener('keydown', (event) =>{
         if (event.key === 'r') {
             if (gameOver) {
@@ -134,13 +149,13 @@ function main(){
         }
     });
 
-    generateBlocks();
-    requestAnimationFrame(drawScene);
+    generateBlocks(); // generates blocks
+    requestAnimationFrame(drawScene); // starts the game loop
 }
 
 /*
 function drawScene():
-base of the game loop
+game loop
 clears canvas
 calls again with requestAnimationFrame
 its function is updating the game many times per sencond
@@ -152,16 +167,16 @@ function drawScene(newTime){
     // Compute the time elapsed since the last frame, in milliseconds
     let deltaTime = (newTime - oldTime) / 1000; // changed to secongs by dividing by 1000 
     oldTime = newTime;
-    console.log(deltaTime);
+    //console.log(deltaTime);
 
-    // clean the canvas so we can draw everything again
+    // clean the canvas so we can draw everything again, every frame everything is erased and drawn again
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     
     ctx.fillStyle = "#FFD1DC";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     ctx.drawImage(background, 0, 0, canvasWidth, canvasHeight);
 
-    // update objects
+    // update object positions
     movePaddle(deltaTime);
     moveBall(deltaTime);
 
@@ -180,8 +195,6 @@ function drawScene(newTime){
         ctx.font = "60px 'Bebas Neue'";
         ctx.fillStyle = "black";
         ctx.fillText("VICTORY", canvasWidth/2, canvasHeight/2);
-        resetPaddle();
-        resetBall();
 
         // restart
         ctx.font = "20px 'Bebas Neue'";
@@ -202,18 +215,21 @@ function drawScene(newTime){
         ctx.fillText("Press R to restart the game", canvasWidth/2, canvasHeight/ 2 + 50);
     }
 
-    requestAnimationFrame(drawScene);
+    // gives the current time in miliseconds, turns it into seconds, gives how many seconds 
+    // passed between frames helping the movement stay smooth even if the FPS change
+    requestAnimationFrame(drawScene); // drawScene called again on the next frame creating an endless loop
 }   
 
+// PADDLE
 function drawPaddle(){
     ctx.fillStyle = paddle.color;
     ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 }
 
-
+// function for moving the paddle
 function movePaddle(deltaTime) {
 
-    // reset each frame
+    // paddle velocity resets every frame
     paddle.velocity.x = 0;
 
     // if right key is pressed and the right border of the paddle is smaller than the canvasWidth
@@ -233,6 +249,8 @@ function movePaddle(deltaTime) {
 
 }
 
+// BALL
+
 function drawBall() {
     /*ctx.fillStyle = ball.color;
     ctx.beginPath();
@@ -245,37 +263,60 @@ function drawBall() {
 
 function moveBall(deltaTime) { // all the functions that imply movement, must have delta time
 
+    if (!ballMoving) { // if the ball hasn´t moved or been launched with the spacebar
+
+        // it gets positioned on top of the paddle right in the middle
+        ball.x = paddle.x + paddle.width/2;
+        ball.y = paddle.y - ball.radius;
+
+        // position update
+        ball.position.x = ball.x;
+        ball.position.y = ball.y;
+        return; // exits so the ball follows the paddle
+    }
+
     // these are the same as position.plus(velocity.times(deltaTime)) but instead we do it manually here:
+    // moves the ball and position is the same way as it is set up in the game_functions lib so boxOverlap has the correct coords
     ball.x += ball.velocity.x * deltaTime;
     ball.y += ball.velocity.y * deltaTime;
 
-    clampWithinCanvasBall();
-    checkBlockCollisions();
+    ball.position.x = ball.x; // this is for the boxOverlap() function, so it has coherence
+    ball.position.y = ball.y; 
+
+    // COLLISIONS
+    clampWithinCanvasBall(); 
+    checkBlockCollisions(); 
     checkPaddleCollisions();
 
     // condition for checking if the player won the game
     if (destroyedBlocks == blocks.length) {
         gameWon = true;
-        console.log("game won jijiji");
+        //console.log("game won");
     }
 
 }
+
+// COLLISIONS
 
 function clampWithinCanvasPaddle() {
-    // Top border
-    if (paddle.x < 0) {
-        paddle.x = 0;   
+    
+    // left wall
+    if (paddle.x < 0) { // is the paddle position on the x axis (left side) trying to go past the left side where x = 0
+        paddle.x = 0;   // if so, reposition the paddle so the left side of it is exactly at x = 0
     }
 
-    if (paddle.x + paddle.width > canvasWidth) {
-        paddle.x = canvasWidth - paddle.width;
-    }
+    // right wall
+    if (paddle.x + paddle.width > canvasWidth) { // is the paddle position on the x axis (right side: position + width) trying to go past the right side past the edge 
+        paddle.x = canvasWidth - paddle.width; // if so, reposition the paddle so the right side of it its exactly where the canvas ends on the x axis
+    } 
 }
 
+// checks all 4 borders of the canvas, top, left, right and bottom (collision with the bottom takes a life)
 function clampWithinCanvasBall() {
+
     // Top border
     if (ball.y - ball.radius < 0) {
-        ball.velocity.y *= -1; // se invierte la velocidad en Y
+        ball.velocity.y *= -1; // velocity inverts on the y axis
         playSound();
     }
 
@@ -287,13 +328,13 @@ function clampWithinCanvasBall() {
 
     // Bottom border
     if (ball.y + ball.radius > canvasHeight) {
-        lives--;
-        if (lives > 0){
-            resetPaddle();
-            resetBall();
+        lives--; // removes a life
+        if (lives > 0){ // if the player has less than 0 lives
+            resetPaddle(); // resets the paddle position
+            resetBall(); // resets the ball position
         } else if (lives <= 0) {
-            console.log("u lost jiji")
-            gameOver = true;
+            //console.log("you lost")
+            gameOver = true; 
             resetPaddle();
             resetBall();
         }
@@ -316,6 +357,8 @@ right = paddle .x + paddle.width
 top = paddle.y
 
 */
+
+// checks 3 conditions, DOES NOT USE THE LIBRARY (decided not to use it since the implementation seemed more simple to me and more achievable for practicing purposes)
 
 function checkPaddleCollisions() {
 
@@ -341,57 +384,26 @@ function resetPaddle() {
     paddle.y = 430;
 }
 
+// converts the ball to the format that boxOverlap expects
+function ballToBox(b) {
+    return {
+        position: { x: b.x, y: b.y },
+        halfSize: { x: b.radius, y: b.radius }
+    };
+}
 
+// this one uses the game_functions lib
+// it iterates through every VISIBLE block of the array
 function checkBlockCollisions() {
-
-    for (let block of blocks) {
-
-        // if the block isn't visible
-        if (!block.visible) continue;
-
-        // VERTICAL checks
-        let ballBottomTouchesBlock = ball.y + ball.radius >= block.y;
-        let ballTopTouchesBlock = ball.y - ball.radius <= block.y + block.height;
-        let ballTouchesBlockY = ballBottomTouchesBlock && ballTopTouchesBlock;
-
-        // HORIZONTAL checks
-        let ballLeft = ball.x - ball.radius;
-        let ballRight = ball.x + ball.radius;
-        let ballTouchesBlockX = ballRight >= block.x && ballLeft <= block.x + block.width;
-        
-        if (ballTouchesBlockY && ballTouchesBlockX) {
-            block.visible = false;
-            destroyedBlocks++;
-
-            // ball coming from the top, bottom or the sides?
-            let hitFromTop    = ball.velocity.y > 0 && ball.y + ball.radius >= block.y;
-            let hitFromBottom = ball.velocity.y < 0 && ball.y - ball.radius <= block.y + block.height;
-            let hitFromRight  = ball.velocity.x > 0 && ballRight >= block.x;
-            let hitFromLeft   = ball.velocity.x < 0 && ballLeft <= block.x + block.width;
-
-            // if separated so corners are handled correctly
-            if (hitFromTop || hitFromBottom) {
-                ball.velocity.y *= -1;
-
-                if (hitFromTop) {
-                    ball.y = block.y - ball.radius;
-                } else {
-                    ball.y = block.y + block.height + ball.radius;
-                }
-            }
-
-            if (hitFromRight || hitFromLeft) {
-                ball.velocity.x *= -1;
-
-                if (hitFromRight) {
-                    ball.x = block.x - ball.radius;
-                } else {
-                    ball.x = block.x + block.width + ball.radius;
-                }
-            }
-
-            playSound();
-            break;
+    // for every block in the blocks array one by one 
+    for (let block of blocks) { // check if
+        // if the block is still visible and the ball's hitbox is overlapping with the block's hitbox
+        if (block.visible && boxOverlap(ball, block)) {
+            ball.velocity.y *= -1; // invert the ball's velocity on the y axis (bounce)
+            block.visible = false; // sets the block to invisible so it disappears
+            destroyedBlocks++; // increase the score counter
+            playSound(); // play the pop sound
+            break; // if the ball destroyed a block already it breaks so it only breaks one block per bounce
         }
     }
 }
@@ -402,6 +414,10 @@ function resetBall() {
     // repositioning the ball to the center of the canvas
     ball.x = paddle.x + paddle.width/2;
     ball.y = paddle.y - ball.radius;
+
+    //
+    ball.position.x = ball.x;
+    ball.position.y = ball.y;
 
     // stopping the ball so it doesn´t move
     ball.velocity.x = 0;
@@ -414,6 +430,8 @@ function resetBall() {
     //ball.velocity.y = -200  
 }
 
+// BLOCKS
+
 // function that draws on the canvas every block that is generated and visible
 function drawBlocks() {
     // for each block OF the block array of objects 
@@ -421,11 +439,11 @@ function drawBlocks() {
         if (block.visible) { // if the block is visible: true it gets drawn in the canvas
             ctx.fillStyle = block.color;
 
-            // Configuración de la sombra para el Canvas
-            ctx.shadowColor = "rgba(101, 15, 158, 0.7)";
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetX = 1;
-            ctx.shadowOffsetY = 1;
+            // shadow blur 
+            ctx.shadowColor = "#ffffff";
+            ctx.shadowBlur = 7;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
 
             ctx.fillRect(block.x, block.y, block.width, block.height);
             
@@ -434,8 +452,10 @@ function drawBlocks() {
 }
 
 // function for generating the blocks automatically, it puts them in the array of objects for the blocks while drawBlocks() draws them
+// generates a grid of rows and columns
 function generateBlocks() {
 
+    // block properties
     let blockWidth = 55;
     let blockHeight = 30;
 
@@ -444,26 +464,28 @@ function generateBlocks() {
     let blockRows = 4;
     let blockCols = 7;
 
-    // variables for defining where the blocks are starting
+    // variables for defining where the blocks are starting, defines the position as the first one to be placed in the top left corner
     let startX = canvasWidth/6; 
     let startY = 80;
 
     // loop that iterates through each row
-    for (let row = 0; row < blockRows; row++) {
+    for (let row = 0; row < blockRows; row++) { // while the number of rows are less than the defined number of blockRows, keep adding rows
 
         // loop that iterates through each col
-        for (let col = 0; col < blockCols; col++) {
+        for (let col = 0; col < blockCols; col++) { // while the numer of cols are less than the defined number of blockCols, keep adding cols
 
             // position on the right
+            // starting point + width of the blocks before it + padding (gaps)
             let x = startX + col * (blockWidth + blockPadding); // blockWidth + blockpadding is how much the block moves to the right 
 
             // position below
             let y = startY + row * (blockHeight + blockPadding);
 
             // create block here
-            let block = {x, y, width: blockWidth, height: blockHeight, color: "rgba(167, 91, 255, 0.7)", visible: true};
+            // added halfSize and position objects so the boxOverlap() function could be used for this collisions
+            let block = {x, y, width: blockWidth, height: blockHeight, color: "rgba(167, 91, 255, 0.7)", visible: true, position: {x: x + blockWidth/2, y: y + blockHeight/2}, halfSize: { x: blockWidth/2, y: blockHeight/2 } };
 
-            blocks.push(block);
+            blocks.push(block); 
         } 
     }
 
@@ -490,14 +512,14 @@ function drawHUD() {
         ctx.textBaseline = "middle";
 
         // BLOCKS left
-        ctx.fillStyle = "#ff4a3d";
+        ctx.fillStyle = "#650f9eb3";
         ctx.fillRect(blocksX, boardY, boardWidth, boardHeight);
 
         ctx.fillStyle = "white";
         ctx.fillText("Blocks: " + destroyedBlocks, boardX + boardWidth / 2, boardY + boardHeight / 1.8);
 
         // LIVES right
-        ctx.fillStyle = "#ff4a3d";
+        ctx.fillStyle = "#650f9eb3";
         ctx.fillRect(livesX, boardY, boardWidth, boardHeight);
 
         ctx.fillStyle = "white";
@@ -513,6 +535,9 @@ function resetGame() {
     destroyedBlocks = 0;
     gameOver = false;
     gameWon = false;
+    ballMoving = false;
+    ball.velocity.x = 0;
+    ball.velocity.y = 0
     resetPaddle();
     resetBall();
     blocks = []; // reset blocks
