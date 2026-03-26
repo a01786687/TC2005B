@@ -30,7 +30,7 @@ let ping;
   about the basic concepts
 */
 
-let paddle = { x: 270, y: 430, width: 100, height: 20, color: "white", velocity: {x:0, y:0}, speed: 350 };
+let paddle = { x: 270, y: 430, width: 100, height: 5, color: "white", velocity: {x:0, y:0}, speed: 350 };
 
 /*
 Ball object
@@ -43,9 +43,11 @@ The ball now has 2 ways of storing the position, the general one x,y which are u
 Position and halfSize are used so the library collision function can detect overlaps
 */
 
-let ball = { x: canvasWidth/2, y: canvasHeight/2, radius: 13, color: "black", velocity: {x:220, y:-220}, position: {x: canvasWidth/2, y: canvasHeight/2}, halfSize: {x: 13, y: 13}};
+let ball = { x: canvasWidth/2, y: canvasHeight/2, radius: 13, color: "black", velocity: {x:220, y:-220}, position: {x: canvasWidth/2, y: canvasHeight/2}, halfSize: {x: 13, y: 13}, speedIncrease: 30, maxSpeed: 500};
+// NOTE -> Added speedIncrease and maxSpeed for an extra on the game
+
 let ballImage = new Image();
-ballImage.src = "../../assets/sprites/gog.png";
+ballImage.src = "../../assets/sprites/ironwhite.png";
 
 // background
 let background = new Image();
@@ -107,12 +109,12 @@ function main(){
     document.addEventListener('keydown', (event) => {
         if (event.key === 'ArrowRight') {
             rightOn = true;
-            console.log("derecha jiji");
+            //console.log("right");
         }
 
         else if (event.key === 'ArrowLeft') {
             leftOn = true;
-            console.log("izquierda jiji");
+            //console.log("left");
         }
     });
 
@@ -131,8 +133,9 @@ function main(){
     document.addEventListener('keydown', (event) => {
     if (event.key === ' ') {
         if (!ballMoving) {
-            ball.velocity.x = 200;
-            ball.velocity.y = -200;
+        
+            ball.velocity.x = 220; // controls the horizontal speed and direction of the ball (positive -> right, negative -> left)
+            ball.velocity.y = -280; // controls the vertical speed and direction of the ball (positive -> down, negative -> up)
             ballMoving = true;
         }
     }
@@ -140,7 +143,7 @@ function main(){
 
     // r letter key
     document.addEventListener('keydown', (event) =>{
-        if (event.key === 'r') {
+        if (event.key === 'r' || 'R') {
             if (gameOver) {
                 resetGame();
             } else if (gameWon) {
@@ -192,13 +195,20 @@ function drawScene(newTime){
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
+        ctx.shadowColor = "#64dcff";
+        ctx.shadowBlur = 30;
+
         ctx.font = "60px 'Bebas Neue'";
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "#64dcff";
         ctx.fillText("VICTORY", canvasWidth/2, canvasHeight/2);
 
         // restart
-        ctx.font = "20px 'Bebas Neue'";
-        ctx.fillText("Press R to restart the game", canvasWidth/2, canvasHeight/ 2 + 50);
+        ctx.shadowBlur = 10;
+        ctx.font = "22px 'Bebas Neue'";
+        ctx.fillStyle = "white";
+        ctx.fillText("Press r to restart the game", canvasWidth/2, canvasHeight/2 + 55);
+
+        ctx.shadowBlur = 0;
     }
 
     // lost
@@ -206,13 +216,21 @@ function drawScene(newTime){
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
+        ctx.shadowColor = "#df629e";
+        ctx.shadowBlur = 30;
+
         ctx.font = "60px 'Bebas Neue'";
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "#da3786";
         ctx.fillText("GAME OVER", canvasWidth/2, canvasHeight/2);
 
         // restart
-        ctx.font = "20px 'Bebas Neue'";
+        ctx.shadowBlur = 10;
+        ctx.font = "22px 'Bebas Neue'";
+        ctx.fillStyle = "white";
         ctx.fillText("Press R to restart the game", canvasWidth/2, canvasHeight/ 2 + 50);
+
+        // reset shadow
+        ctx.shadowBlur = 0;
     }
 
     // gives the current time in miliseconds, turns it into seconds, gives how many seconds 
@@ -316,12 +334,14 @@ function clampWithinCanvasBall() {
 
     // Top border
     if (ball.y - ball.radius < 0) {
+        ball.y = ball.radius; // repositions the ball to fix the bug of the ball getting stuck on the canvas sides
         ball.velocity.y *= -1; // velocity inverts on the y axis
         playSound();
     }
 
     // Left border
     if (ball.x - ball.radius < 0) {
+        ball.x = ball.radius; 
         ball.velocity.x *= -1;
         playSound();
     }
@@ -342,6 +362,7 @@ function clampWithinCanvasBall() {
 
     // Right border
     if (ball.x + ball.radius > canvasWidth) {
+        ball.x = canvasWidth - ball.radius;
         ball.velocity.x *= -1;
         playSound();
     }
@@ -373,6 +394,7 @@ function checkPaddleCollisions() {
     if (ball.velocity.y > 0 && ballTouchesPaddle && ballInsidePaddleWidth) {
         ball.y = paddle.y - ball.radius; // place the ball on top of the paddle
         ball.velocity.y *= -1; // invert direction
+        increaseSpeed();
         playSound();
     }
 
@@ -382,14 +404,6 @@ function resetPaddle() {
     // repositioning the paddle to the center of the canvas
     paddle.x = canvasWidth/2 - paddle.width/2;
     paddle.y = 430;
-}
-
-// converts the ball to the format that boxOverlap expects
-function ballToBox(b) {
-    return {
-        position: { x: b.x, y: b.y },
-        halfSize: { x: b.radius, y: b.radius }
-    };
 }
 
 // this one uses the game_functions lib
@@ -402,6 +416,7 @@ function checkBlockCollisions() {
             ball.velocity.y *= -1; // invert the ball's velocity on the y axis (bounce)
             block.visible = false; // sets the block to invisible so it disappears
             destroyedBlocks++; // increase the score counter
+            //increaseSpeed(); // increasing the speed
             playSound(); // play the pop sound
             break; // if the ball destroyed a block already it breaks so it only breaks one block per bounce
         }
@@ -440,8 +455,8 @@ function drawBlocks() {
             ctx.fillStyle = block.color;
 
             // shadow blur 
-            ctx.shadowColor = "#ffffff";
-            ctx.shadowBlur = 7;
+            ctx.shadowColor = block.color;
+            ctx.shadowBlur = 15;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 0;
 
@@ -449,6 +464,9 @@ function drawBlocks() {
             
         }
     }
+
+    // reset shadow so it doesn't affect other objects, only the blocks
+    ctx.shadowBlur = 0;
 }
 
 // function for generating the blocks automatically, it puts them in the array of objects for the blocks while drawBlocks() draws them
@@ -468,6 +486,16 @@ function generateBlocks() {
     let startX = canvasWidth/6; 
     let startY = 80;
 
+    // implementing colors as an extra for the game
+    // row 0: pink
+    // row 1: yellow
+    // row 2: blue
+    // row 3: purple
+
+    // #a75bffb3
+
+    let rowColors = ["rgba(255, 100, 150, 0.85)", "rgba(255, 200, 80, 0.85)", "rgba(100, 220, 255, 0.85)", "rgba(180, 100, 255, 0.85)"];
+
     // loop that iterates through each row
     for (let row = 0; row < blockRows; row++) { // while the number of rows are less than the defined number of blockRows, keep adding rows
 
@@ -483,7 +511,7 @@ function generateBlocks() {
 
             // create block here
             // added halfSize and position objects so the boxOverlap() function could be used for this collisions
-            let block = {x, y, width: blockWidth, height: blockHeight, color: "rgba(167, 91, 255, 0.7)", visible: true, position: {x: x + blockWidth/2, y: y + blockHeight/2}, halfSize: { x: blockWidth/2, y: blockHeight/2 } };
+            let block = {x, y, width: blockWidth, height: blockHeight, color: rowColors[row], visible: true, position: {x: x + blockWidth/2, y: y + blockHeight/2}, halfSize: { x: blockWidth/2, y: blockHeight/2 } };
 
             blocks.push(block); 
         } 
@@ -505,6 +533,10 @@ function drawHUD() {
         const blocksX = 30; // left
         const livesX = canvasWidth - boardWidth - 30;
 
+        // glowy effect
+        ctx.shadowColor = "#b464ffe6";
+        ctx.shadowBlur = 15;
+
         // text style
         ctx.font = "25px 'Bebas Neue'";
         ctx.fillStyle = "white";
@@ -512,18 +544,28 @@ function drawHUD() {
         ctx.textBaseline = "middle";
 
         // BLOCKS left
-        ctx.fillStyle = "#650f9eb3";
+        ctx.fillStyle = "#6400b4bf";
         ctx.fillRect(blocksX, boardY, boardWidth, boardHeight);
 
         ctx.fillStyle = "white";
         ctx.fillText("Blocks: " + destroyedBlocks, boardX + boardWidth / 2, boardY + boardHeight / 1.8);
 
         // LIVES right
-        ctx.fillStyle = "#650f9eb3";
+        ctx.fillStyle = "#6400b4bf";
         ctx.fillRect(livesX, boardY, boardWidth, boardHeight);
+
+        ctx.shadowBlur = 0;
+
+        // neon borders
+        ctx.strokeStyle = "rgba(180, 100, 255, 0.9)"; // stroke color
+        ctx.lineWidth = 2;
+        ctx.strokeRect(blocksX, boardY, boardWidth, boardHeight);
+        ctx.strokeRect(livesX, boardY, boardWidth, boardHeight);
 
         ctx.fillStyle = "white";
         ctx.fillText("Lives: " + lives, livesX + boardWidth / 2, boardY + boardHeight /1.8);
+
+        ctx.shadowBlur = 0;
 
 }
 
@@ -549,3 +591,35 @@ function playSound() {
     ping.play();
 }
 
+
+// increasing the ball's speed every time it bounces with the paddle
+function increaseSpeed() {
+
+    // Math.hypot(x ,y) calculates the speed of the ball by combining x and y velocity components
+    // this is the equivalent of magnitude() from Vector.js -> Math.sqrt(this.x ** 2 + this.y ** 2)
+    // I used Math.hypot instead of the libs because of how my ball object stores the velocity as x and y, not as Vector objects
+    let currentSpeed = Math.hypot(ball.velocity.x, ball.velocity.y);
+
+    // only increases the speed if the ball hasn't reached the max speed yet
+    if (currentSpeed < ball.maxSpeed) {
+
+        // add the speed increase (declared in the ball object) to the current speed to get the new speed
+        let newSpeed = currentSpeed + ball.speedIncrease;
+
+        // divide each velocity component by the current speed to get the direction, the unitary vector
+        // then multiply by newSpeed to apply the new speed while keeping the same direction
+        // this follows the same idea as normalize().times(newSpeed) -> return new Vector(this.x / mag, this.y / mag); <- thats the normalize() method from the Vector lib
+        // again I didn't use the lib because the velocity I declared in the ball object is not a vector object
+        ball.velocity.x = (ball.velocity.x / currentSpeed) * newSpeed;
+        ball.velocity.y = (ball.velocity.y / currentSpeed) * newSpeed
+
+        //console.log("Speed:", Math.hypot(ball.velocity.x, ball.velocity.y));
+
+    }
+}
+
+/* 
+REFERENCES:
+Math.hypot() calculates the square root of the sum of squares of its arguments, equivalent to the magnitude() method in Vector.js
+https://www.educative.io/answers/what-is-mathhypot-in-javascript
+*/

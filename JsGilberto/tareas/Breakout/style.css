@@ -1,5 +1,41 @@
+/* 
+Reset default browser margins
+*/
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box; /* Ensures consistent box model */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #0d0015;
+    text-align: center;
+    padding-top: 30px;
+    font-family: 'Bebas Neue', sans-serif;
+}
+
+h1 {
+    color: #b464ff;
+    font-size: 48px;
+    letter-spacing: 4px;
+    margin-bottom: 16px;
+    text-shadow:
+        0 0 10px rgba(180, 100, 255, 0.8),
+        0 0 30px rgba(180, 100, 255, 0.5),
+        0 0 60px rgba(180, 100, 255, 0.2);
+}
+
+canvas {
+    border: 2px solid #b464ff; /* solid is the style of the line */
+    display: block;
+    margin: 0 auto;
+
+    /* display and block centers the canvas */
+}
+
+.instructions {
+    margin-top: 16px; 
+    color: #ffffff;
+    font-size: 18px;
+    letter-spacing: 2px;
 }
